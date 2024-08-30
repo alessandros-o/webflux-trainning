@@ -1,5 +1,7 @@
 package br.com.alessandro.webflux_course.controller;
 
+import br.com.alessandro.webflux_course.model.request.UserRequest;
+import br.com.alessandro.webflux_course.model.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -11,7 +13,7 @@ public interface UserController {
     ResponseEntity<Mono<Void>> save(@RequestBody UserRequest request);
 
     @GetMapping(value = "/{id}")
-    ResponseEntity<Mono<UseResponse>> find(@PathVariable String id);
+    ResponseEntity<Mono<UserResponse>> find(@PathVariable String id);
 
     @GetMapping
     ResponseEntity<Flux<UserResponse>> findAll();
