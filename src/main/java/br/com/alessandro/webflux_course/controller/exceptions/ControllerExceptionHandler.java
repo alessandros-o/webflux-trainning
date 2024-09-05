@@ -1,5 +1,6 @@
 package br.com.alessandro.webflux_course.controller.exceptions;
 
+import br.com.alessandro.webflux_course.service.exception.ObjectNotFoundException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +50,21 @@ public class ControllerExceptionHandler {
             return "E-mail already registered";
         }
         return "Dup Key Exception";
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    ResponseEntity<Mono<StandardError>> objectNotFoundException(ObjectNotFoundException ex, ServerHttpRequest request) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Mono.just(
+                        StandardError.builder()
+                                .timeStamp(LocalDateTime.now())
+                                .path(request.getPath().toString())
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                                .message(ex.getMessage())
+                                .build()
+                ));
+
     }
 }
