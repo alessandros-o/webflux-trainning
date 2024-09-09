@@ -3,6 +3,7 @@ package br.com.alessandro.webflux_course.service;
 import br.com.alessandro.webflux_course.entity.User;
 import br.com.alessandro.webflux_course.mapper.UserMapper;
 import br.com.alessandro.webflux_course.model.request.UserRequest;
+import br.com.alessandro.webflux_course.model.response.UserResponse;
 import br.com.alessandro.webflux_course.repository.UserRepository;
 import br.com.alessandro.webflux_course.service.exception.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,11 @@ public class UserService {
 
     public Flux<User> findAll() {
         return repository.findAll();
+    }
+
+    public Mono<User> update(String id, UserRequest request) {
+        return findById(id)
+                .map(entity -> mapper.toEntity(request, entity))
+                .flatMap(repository::save);
     }
 }
