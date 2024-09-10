@@ -3,7 +3,6 @@ package br.com.alessandro.webflux_course.service;
 import br.com.alessandro.webflux_course.entity.User;
 import br.com.alessandro.webflux_course.mapper.UserMapper;
 import br.com.alessandro.webflux_course.model.request.UserRequest;
-import br.com.alessandro.webflux_course.model.response.UserResponse;
 import br.com.alessandro.webflux_course.repository.UserRepository;
 import br.com.alessandro.webflux_course.service.exception.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,7 @@ public class UserService {
     }
 
     public Mono<User> findById(final String id) {
-        return repository.findById(id)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException(
-                        format("Object not found. Id: %s, Type: %s", id, User.class.getSimpleName())
-                )));
+        return handleNotFound(repository.findById(id), id);
     }
 
     public Flux<User> findAll() {
@@ -41,5 +37,16 @@ public class UserService {
         return findById(id)
                 .map(entity -> mapper.toEntity(request, entity))
                 .flatMap(repository::save);
+    }
+
+    public Mono<Void> findAndRemove(String id) {
+        return handleNotFound(repository.findAndRemove(id), id).then();
+    }
+
+    private <T> Mono<T> handleNotFound(Mono<T> mono, String id) {
+        return mono.switchIfEmpty(Mono.error(
+                new ObjectNotFoundException(
+                        format("Object not found. Id: %s, Type: %s", id, User.class.getSimpleName())
+                )));
     }
 }
