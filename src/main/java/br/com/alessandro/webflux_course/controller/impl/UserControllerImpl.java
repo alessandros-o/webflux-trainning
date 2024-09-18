@@ -4,6 +4,7 @@ import br.com.alessandro.webflux_course.controller.UserController;
 import br.com.alessandro.webflux_course.mapper.UserMapper;
 import br.com.alessandro.webflux_course.model.request.UserRequest;
 import br.com.alessandro.webflux_course.model.response.UserResponse;
+import br.com.alessandro.webflux_course.service.EmailService;
 import br.com.alessandro.webflux_course.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,14 @@ public class UserControllerImpl implements UserController {
 
     private final UserService service;
     private final UserMapper mapper;
+    private final EmailService emailService;
 
     @Override
     public ResponseEntity<Mono<Void>> save(UserRequest request) {
-        var result = service.save(request).then();
+        var result = service.save(request)
+                .doOnNext(emailService::confirmaCadastro)
+                .then();
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(result);
     }
